@@ -4,6 +4,30 @@
 
  -
 
+## [1.1.0] Denoise - 2020-09-17
+
+This release focuses on reducing the noise from the system.
+For this purpse, it introduces the `rebench-denoise` tool, which will adapt
+system parameters to:
+
+- change CPU governor to the performance setting
+- disables turbo boost
+- reduces the sampling frequency allowed byte the kernel
+- execute benchmarks with CPU shielding and `nice -n-20`
+
+Note that the use of `rebench-denoise` will require root rights.
+It can also be used as stand-alone tool, for which documentation is here:
+https://rebench.readthedocs.io/en/latest/denoise/
+
+Thanks to @tobega and @qinsoon for contributing bug fixes.
+
+ - added denoise, the noise reduction tool (#143, #144)
+ - `-R` now disables data reporting, replacing the previous `-S` (#145)
+ - added support to report experiment completion to ReBenchDB (#149)
+ - fixed JMH support (#147)
+ - fixed string/byte encoding issues between Python 2 and 3 (#142)
+ - updated py-cpuinfo (#137, #138, #141)
+
 ## [1.0.1] - 2020-06-23
 
 This is a bug fix release.
@@ -151,7 +175,9 @@ Thank you!
  - [0.6.0] - 2014-05-19
  - [0.5.0] - 2014-03-25
 
-[Unreleased]: https://github.com/smarr/ReBench/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/smarr/ReBench/compare/v1.1.0...HEAD
+[1.1.0]:  https://github.com/smarr/ReBench/compare/v1.0.1...v1.1.0
+[1.0.1]:  https://github.com/smarr/ReBench/compare/v1.0.0...v1.0.1
 [1.0.0]:  https://github.com/smarr/ReBench/compare/v1.0rc2...v1.0.0
 [1.0rc2]: https://github.com/smarr/ReBench/compare/v1.0rc1...v1.0rc2
 [1.0rc1]: https://github.com/smarr/ReBench/compare/v0.10.1...v1.0rc1
