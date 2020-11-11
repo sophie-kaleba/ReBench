@@ -33,6 +33,8 @@ class RebenchLogAdapter(GaugeAdapter):
     """
     re_log_line = re.compile(
         r"^(?:.*: )?([^\s]+)( [\w\.]+)?: iterations=([0-9]+) runtime: ([0-9]+)([mu])s")
+    re_log_line_custom = re.compile(
+        r"^(?:.*: )?([^\s]+)( [\w\.]+)?: iterations=([0-9]+) runtime: ([0-9]+)([mu])s start: ([0-9]+) tzero: ([0-9]+)")
     re_extra_criterion_log_line = re.compile(
         r"^(?:.*: )?([^\s]+): ([^:]{1,30}):\s*([0-9]+)([a-zA-Z]+)")
 
@@ -56,23 +58,35 @@ class RebenchLogAdapter(GaugeAdapter):
                     "Output of bench program indicated error.")
 
             measure = None
-            match = self.re_log_line.match(line)
+            match = self.re_log_line_custom.match(line)
             if match:
                 time = float(match.group(4))
+                start = float(match.group(6))
+                tzero = float(match.group(7))
                 if match.group(5) == "u":
                     time /= 1000
                 criterion = (match.group(2) or 'total').strip()
 
-                measure = Measurement(invocation, iteration, time, 'ms', run_id, criterion)
+                measure = Measurement(invocation, iteration, time, 'ms', run_id, criterion, start, tzero)
 
             else:
-                match = self.re_extra_criterion_log_line.match(line)
+                match = self.re_log_line.match(line)
                 if match:
-                    value = float(match.group(3))
-                    criterion = match.group(2)
-                    unit = match.group(4)
+                    time = float(match.group(4))
+                    if match.group(5) == "u":
+                        time /= 1000
+                    criterion = (match.group(2) or 'total').strip()
 
-                    measure = Measurement(invocation, iteration, value, unit, run_id, criterion)
+                    measure = Measurement(invocation, iteration, time, 'ms', run_id, criterion)
+
+                else: 
+                    match = self.re_extra_criterion_log_line.match(line)
+                    if match:
+                        value = float(match.group(3))
+                        criterion = match.group(2)
+                        unit = match.group(4)
+
+                        measure = Measurement(invocation, iteration, value, unit, run_id, criterion)
 
             if measure:
                 current.add_measurement(measure)

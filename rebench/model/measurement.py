@@ -22,13 +22,15 @@ from .run_id import RunId
 
 class Measurement(object):
     def __init__(self, invocation, iteration, value, unit,
-                 run_id, criterion='total', line_number=None, filename=None):
+                 run_id, criterion='total', start=None, tzero=None, line_number=None, filename=None):
         self._invocation = invocation
         self._iteration = iteration
         self._value = value
         self._unit = unit
         self._run_id = run_id
         self._criterion = criterion
+        self._start = start
+        self._tzero = tzero
         assert unit is not None
         self._line_number = line_number
         self._filename = filename
@@ -55,6 +57,14 @@ class Measurement(object):
     @property
     def unit(self):
         return self._unit
+    
+    @property
+    def start(self):
+        return self._start
+
+    @property
+    def tzero(self):
+        return self._tzero
 
     @property
     def run_id(self):
@@ -77,7 +87,7 @@ class Measurement(object):
         return [str(self._invocation), str(self._iteration),
                 val,
                 self._unit,
-                self._criterion] + self._run_id.as_str_list()
+                self._criterion] + self._run_id.as_str_list() + [str(self._start), str(self._tzero)] 
 
     @classmethod
     def from_str_list(cls, data_store, str_list, line_number=None, filename=None):
@@ -98,4 +108,5 @@ class Measurement(object):
         result['it'] = self._iteration
         result['u'] = self._unit
         result['v'] = self._value
+        result['s'] = self._start
         return result
